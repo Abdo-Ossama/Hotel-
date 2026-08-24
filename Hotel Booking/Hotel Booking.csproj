@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Hotel_Booking</RootNamespace>
+    <UserSecretsId>aa153468-370a-4c5b-9c8e-bf5416609b6f</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mapster.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.19" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.19" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.19">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.16.20" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\" />
+    <Folder Include="Areas\Guest\" />
+    <Folder Include="DTOs\Responce\" />
+  </ItemGroup>
+
+</Project>
