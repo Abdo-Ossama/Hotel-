@@ -1,6 +1,4 @@
 ﻿using Hotel_Booking.DataAccess;
-using Hotel_Booking.Models;
-using Hotel_Booking.Utilites;
 using Hotel_Booking.Utilites.DbIntialiaion;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -12,44 +10,56 @@ namespace Hotel_Booking.API.Utility.DbInitializers
         private readonly ApplicationDbContext _context;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly ILogger<DbInitializer> _logger;
 
-        public DbInitializer(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, ApplicationDbContext context, ILogger<DbInitializer> logger)
+        public DbInitializer(
+            RoleManager<IdentityRole> roleManager,
+            UserManager<ApplicationUser> userManager,
+            ApplicationDbContext context)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _context = context;
-            _logger = logger;
         }
 
         public async Task Initialize()
         {
-            
-            
-                if (_context.Database.GetPendingMigrations().Any())
-                    _context.Database.Migrate();
+          
+            if ((await _context.Database.GetPendingMigrationsAsync()).Any())
+            {
+                await _context.Database.MigrateAsync();
+            }
 
-                if (!_roleManager.Roles.Any())
+            // 2. create roles ..
+            if (!await _roleManager.RoleExistsAsync(SD.RECEPTIONIST_ROLE))
+                await _roleManager.CreateAsync(new IdentityRole(SD.RECEPTIONIST_ROLE));
+
+            if (!await _roleManager.RoleExistsAsync(SD.GUEST_ROLE))
+                await _roleManager.CreateAsync(new IdentityRole(SD.GUEST_ROLE));
+
+            if (!await _roleManager.RoleExistsAsync(SD.ADMIN_ROLE))
+                await _roleManager.CreateAsync(new IdentityRole(SD.ADMIN_ROLE));
+
+            var adminEmail = "Admin@hotel.com";
+            var adminUser = await _userManager.FindByEmailAsync(adminEmail);
+
+            if (adminUser == null)
+            {
+                var newAdmin = new ApplicationUser
                 {
-                    await _roleManager.CreateAsync(new(SD.GUEST_ROLE));
-                    await _roleManager.CreateAsync(new(SD.ADMIN_ROLE));
-                
+                    Email = adminEmail,
+                    EmailConfirmed = true,
+                    FirstName = "Hotel",
+                    LastName = "Admin",
+                    UserName = "abdo_Admin"
+                };
 
-                    await _userManager.CreateAsync(new()
-                    {
-                        Email = "SuperAdmin@hotel.com",
-                        EmailConfirmed = true,
-                        FirstName = "Super",
-                        LastName = "Admin",
-                        UserName = "SuperAdmin",
-                    }, "Admin123$");
+                var result = await _userManager.CreateAsync(newAdmin, "Admin123$");
 
-                    var user = await _userManager.FindByEmailAsync("SuperAdmin@hotel.com");
-
-                    await _userManager.AddToRoleAsync(user!, SD.ADMIN_ROLE);
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(newAdmin, SD.ADMIN_ROLE);
                 }
             }
-          
         }
     }
-
+}

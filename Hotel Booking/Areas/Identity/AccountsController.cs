@@ -1,15 +1,15 @@
 ﻿
-using Hotel_Booking.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Hotel_Booking.Areas.Identity
 {
     [Area(SD.IDENTITY_AREA)]
-    [Route("[area]/[controller]")]
+    [Route("api/[area]/[controller]")]
     [ApiController]
     public class AccountsController : ControllerBase
     {
@@ -24,7 +24,8 @@ namespace Hotel_Booking.Areas.Identity
             IJWTHandler jwtHandler,
             ILogger<AccountsController> logger,
              IAccountService accountService,
-              IGoogleAuthService googleAuthService)
+              IGoogleAuthService googleAuthService,
+              SignInManager<ApplicationUser> signInManger)
 
         {
             _userManager = userManager;
@@ -32,6 +33,7 @@ namespace Hotel_Booking.Areas.Identity
             _logger = logger;
             _accountService = accountService;
             _googleAuthService = googleAuthService;
+       
         }
 
 
@@ -58,11 +60,29 @@ namespace Hotel_Booking.Areas.Identity
             var token =
                 await _accountService.GoogleLoginAsync(googleUser);
 
-            return Ok(new
+            return Ok(new APIResponse
             {
-                message = "Google login successful.",
-                token
+                Message = [$"Welcome, {googleUser.FirstName}"],
+                Data = token
             });
         }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(
+         DTOs.Request.LoginRequest loginRequest,
+         CancellationToken cancellationToken)
+        {
+            var token = await _accountService.LoginAsync(
+                loginRequest,
+                cancellationToken);
+
+            return Ok(new APIResponse
+            {
+                StatusCode = StatusCodes.Status200OK,
+                Message = [$"Welcome, {loginRequest.Email}"],
+                Data = token
+            });
+        }
+
     }
 }

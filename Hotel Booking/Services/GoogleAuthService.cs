@@ -1,24 +1,23 @@
-﻿
-using Hotel_Booking.Models.DTOs.Request;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.Security.Claims;
 
 namespace Hotel_Booking.Services
 {
-    public class GoogleAuthService :IGoogleAuthService
+    public class GoogleAuthService : IGoogleAuthService
     {
         private readonly ILogger<GoogleAuthService> _logger;
 
-        public GoogleAuthService(ILogger<GoogleAuthService> logger)
+        public GoogleAuthService(
+            ILogger<GoogleAuthService> logger)
         {
             _logger = logger;
         }
-        
 
-        public async Task<GoogleUserInfo> GoogleService(HttpContext httpContext)
+
+        public async Task<GoogleUserInfo> GoogleService(
+            HttpContext httpContext)
         {
-
             // 1. Get Google authentication result
             var result = await httpContext.AuthenticateAsync(
                 GoogleDefaults.AuthenticationScheme);
@@ -29,9 +28,7 @@ namespace Hotel_Booking.Services
                     "Google authentication failed.");
 
                 throw new UnauthorizedAccessException(
-
-                    "Google authentication failed."
-               ); 
+                    "Google authentication failed.");
             }
 
 
@@ -56,26 +53,37 @@ namespace Hotel_Booking.Services
                 .Value;
 
 
-
             if (string.IsNullOrWhiteSpace(email))
             {
                 _logger.LogWarning(
                     "Google login failed because email was not provided.");
 
-                throw new BadHttpRequestException("Google account email was not found.");
-
-
+                throw new ValidationAppException(
+                    "Invalid Google authentication data.",
+                    new Dictionary<string, string[]>
+                    {
+                        ["Email"] =
+                        [
+                            "Google account email was not found."
+                        ]
+                    });
             }
-            
+
 
             if (string.IsNullOrWhiteSpace(googleId))
             {
                 _logger.LogWarning(
                     "Google login failed because Google ID was not provided.");
 
-                throw new BadHttpRequestException("Google account ID was not found.");
-
-
+                throw new ValidationAppException(
+                    "Invalid Google authentication data.",
+                    new Dictionary<string, string[]>
+                    {
+                        ["GoogleId"] =
+                        [
+                            "Google account ID was not found."
+                        ]
+                    });
             }
 
 
@@ -84,17 +92,20 @@ namespace Hotel_Booking.Services
                 Email = email,
 
                 GoogleId = googleId,
-
+              
                 FirstName =
-                   string.IsNullOrWhiteSpace(firstName)
-                       ? "User"
-                       : firstName,
+                    string.IsNullOrWhiteSpace(firstName)
+                        ? "User"
+                        : firstName,
 
                 LastName =
-                   string.IsNullOrWhiteSpace(lastName)
-                       ? string.Empty
-                       : lastName
+                    string.IsNullOrWhiteSpace(lastName)
+                        ? string.Empty
+                        : lastName
+
+                       
             };
         }
     }
 }
+

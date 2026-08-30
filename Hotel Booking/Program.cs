@@ -1,6 +1,11 @@
+using Hotel_Booking.API.Exceptions;
+using Hotel_Booking.API.Utility.DbInitializers;
 using Hotel_Booking.DataAccess;
 using Hotel_Booking.Models;
+using Hotel_Booking.Repositories;
+using Hotel_Booking.Repositories.IRepositories;
 using Hotel_Booking.Services;
+using Hotel_Booking.Utilites.DbIntialiaion;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -92,10 +97,14 @@ builder.Services.AddOpenApi();
 
 
 
-
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+// 1. التسجيل الصحيح باستخدام الـ Interface
+builder.Services.AddScoped<IDbIntializer, DbInitializer>();
 // Services
 
 builder.Services.AddScoped<IAccountService, AccountService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IJWTHandler, JWTHandler>();
 
@@ -108,7 +117,18 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+// Database Initializer
+using (var scope = app.Services.CreateScope())
+{
+
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbIntializer>();
+        await dbInitializer.Initialize();
+    
+
+}
+
 app.UseHttpsRedirection();
+
 
 app.UseAuthentication();
 app.UseAuthorization();

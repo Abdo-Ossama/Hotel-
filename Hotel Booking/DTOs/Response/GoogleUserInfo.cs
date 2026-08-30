@@ -1,4 +1,4 @@
-﻿namespace Hotel_Booking.Models.DTOs.Request
+﻿namespace Hotel_Booking.DTOs.Response
 {
     public class GoogleUserInfo
     {
@@ -7,7 +7,10 @@
         public string GoogleId { get; set; } = string.Empty;
 
         public string FirstName { get; set; } = string.Empty;
+        public string userName { get; set; } = string.Empty;
 
         public string LastName { get; set; } = string.Empty;
+
+        public List<string> Roles { get; set; } 
     }
 }
