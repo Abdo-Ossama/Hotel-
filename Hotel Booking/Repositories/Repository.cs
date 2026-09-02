@@ -1,11 +1,12 @@
 ﻿using Hotel_Booking.DataAccess;
+using Hotel_Booking.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace Hotel_Booking.Repositories
 {
-    public class Repository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly ApplicationDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -20,11 +21,15 @@ namespace Hotel_Booking.Repositories
             _logger = logger;
         }
 
+
+
         // Get All
         public async Task<IEnumerable<T>> GetAsync(
             Expression<Func<T, bool>>? expression = null,
             Expression<Func<T, object>>?[]? includes = null,
-            bool tracked = true,
+              bool tracked = true,
+              Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
+
             CancellationToken cancellationToken = default)
         {
             _logger.LogDebug(
@@ -49,6 +54,10 @@ namespace Hotel_Booking.Repositories
                     }
                 }
             }
+            if (includeThen is not null)
+            {
+                values = includeThen(values);
+            }
 
             if (!tracked)
             {
@@ -70,7 +79,9 @@ namespace Hotel_Booking.Repositories
         public async Task<T?> GetOneAsync(
             Expression<Func<T, bool>>? expression = null,
             Expression<Func<T, object>>?[]? includes = null,
-            bool tracked = true,
+             bool tracked = true,
+              Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
+
             CancellationToken cancellationToken = default)
         {
             _logger.LogDebug(
@@ -94,6 +105,10 @@ namespace Hotel_Booking.Repositories
                         values = values.Include(item);
                     }
                 }
+            }
+            if (includeThen is not null)
+            {
+                values = includeThen(values);
             }
 
             if (!tracked)
@@ -121,7 +136,7 @@ namespace Hotel_Booking.Repositories
 
 
         // Create
-        public async Task Create(
+        public async Task CreateAysnc(
             T entity,
             CancellationToken cancellationToken = default)
         {

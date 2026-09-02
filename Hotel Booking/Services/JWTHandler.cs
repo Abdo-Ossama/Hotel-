@@ -1,8 +1,5 @@
-﻿
-namespace Hotel_Booking.Services
+﻿namespace Hotel_Booking.Services
 {
-    using Hotel_Booking.Models;
-    using Hotel_Booking.Services.IServices;
     using Microsoft.AspNetCore.Identity;
 
     using Microsoft.IdentityModel.Tokens;

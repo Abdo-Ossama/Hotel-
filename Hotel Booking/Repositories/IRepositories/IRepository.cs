@@ -5,23 +5,25 @@ namespace Hotel_Booking.Repositories.IRepositories
     public interface IRepository<T> where T : class
     {
         Task<IEnumerable<T>> GetAsync(
-        Expression<Func<T, bool>>? expression = null,
-        Expression<Func<T, object>>?[]? includes = null,
-        bool tracked = true,
-        CancellationToken cancellationToken = default);
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>?[]? includes = null, 
+            bool tracked = true,
+              Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
+            CancellationToken cancellationToken = default);
 
+        Task<T?> GetOneAsync(
+            Expression<Func<T, bool>>? expression = null,
+            Expression<Func<T, object>>?[]? includes = null,
+            bool tracked = true,
+                Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
+            CancellationToken cancellationToken = default);
 
+        Task CreateAysnc(T entity, CancellationToken cancellationToken = default);
 
-         Task<IEnumerable<T>> GetOneAsync(  
-        Expression<Func<T, bool>>? expression = null,
-        Expression<Func<T, object>>?[]? includes = null,
-        bool tracked = true,
-        CancellationToken cancellationToken = default);
+        void Update(T entity);
 
+        void Delete(T entity);
 
-
-        Task<T> Create(T entity, CancellationToken cancellationToken);
-        Task<T> Update(T entity);
-        Task<T> Delete(T entity);
+        Task<int> CommitAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -7,7 +7,6 @@ public class RoomImage
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Image URL is required.")]
-    [Url(ErrorMessage = "Invalid image URL format.")]
  
     public string Url { get; set; } = string.Empty;
 

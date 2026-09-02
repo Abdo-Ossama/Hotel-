@@ -105,9 +105,15 @@ namespace Hotel_Booking.DataAccess
      .HasForeignKey<Review>(e => e.BookingId)
      .OnDelete(DeleteBehavior.Restrict);
 
+            // RowVersion ( ROOM)
 
+            builder.Entity<Room>()
+    .Property(r => r.RowVersion)
+    .IsRowVersion();
         }
         
+
+
 
         
     }
