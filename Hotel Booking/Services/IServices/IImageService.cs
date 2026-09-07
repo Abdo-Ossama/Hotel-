@@ -1,4 +1,4 @@
-﻿namespace CodegateTest.Services.IServices
+﻿namespace Hotel_Booking.Services.IServices
 {
     public interface IImageService
     {

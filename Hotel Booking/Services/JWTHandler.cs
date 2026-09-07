@@ -48,7 +48,7 @@
                 issuer: _configuration["JWT:Issuer"],
                 audience: _configuration["JWT:Audience"],
                 claims: claims,
-              expires: DateTime.UtcNow.AddMinutes(15),
+              expires: DateTime.UtcNow.AddMinutes(50),
                 signingCredentials: signingCredentials
             );
 

@@ -1,7 +1,4 @@
-﻿
-using CodegateTest.Services;
-using CodegateTest.Services.IServices;
-using Hotel_Booking.Enums;
+﻿using Hotel_Booking.Enums;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -64,29 +61,24 @@ namespace Hotel_Booking.Services
             }
 
             // Get From Database
-            var rooms = await _roomsRepository.GetAsync(
-                e => e.Status == RoomStatus.Available,
-
-                includes:
-                [
-                    e => e.RoomType,
+            var roomqQuery = _roomsRepository.GetQueryable(
+                  includes:
+                  [
+                      e => e.RoomType,
                     e => e.RoomImages
-                ],
+                  ],
+                  tracked: false);
+            roomqQuery = roomqQuery
+                .Include(e => e.RoomAmenities)
+                .ThenInclude(e => e.Amenity);
 
-                includeThen: e => e
-                    .Include(e => e.RoomAmenities)
-                    .ThenInclude(e => e.Amenity),
 
-                tracked: false,
-                cancellationToken: cancellationToken
-            );
-
-            var totalRooms = rooms.Count();
+            var totalRooms = await roomqQuery.CountAsync(cancellationToken);
 
             var totalPages = (int)Math.Ceiling(
                 totalRooms / (double)pageSize);
 
-            var items = rooms
+            var rooms = roomqQuery
                 .OrderBy(e => e.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -95,8 +87,10 @@ namespace Hotel_Booking.Services
 
             var response = new PagedResponse<RoomResponse>
             {
-                Items = items,
-                Page = page,
+                Items = rooms,
+                CurrentPage = page,
+                HasPrevious = page - 1,
+                HasNext = page + 1,
                 PageSize = pageSize,
                 TotalCount = totalRooms,
                 TotalPages = totalPages
@@ -132,27 +126,25 @@ namespace Hotel_Booking.Services
                     });
             }
 
-            var rooms = await _roomsRepository.GetAsync(
+
+            var roomqQuery = _roomsRepository.GetQueryable(
                 includes:
                 [
                     e => e.RoomType,
                     e => e.RoomImages
                 ],
+                tracked: false);
+            roomqQuery = roomqQuery
+                .Include(e => e.RoomAmenities)
+                .ThenInclude(e => e.Amenity);
 
-                includeThen: e => e
-                    .Include(e => e.RoomAmenities)
-                    .ThenInclude(e => e.Amenity),
-
-                tracked: false,
-                cancellationToken: cancellationToken
-            );
-
-            var totalRooms = rooms.Count();
+ 
+            var totalRooms = await roomqQuery.CountAsync(cancellationToken);
 
             var totalPages = (int)Math.Ceiling(
                 totalRooms / (double)pageSize);
 
-            var items = rooms
+            var rooms = roomqQuery
                 .OrderBy(e => e.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -161,8 +153,10 @@ namespace Hotel_Booking.Services
 
             return new PagedResponse<RoomResponse>
             {
-                Items = items,
-                Page = page,
+                Items = rooms,
+                CurrentPage = page,
+                HasPrevious = page -1,
+                HasNext = page + 1,
                 PageSize = pageSize,
                 TotalCount = totalRooms,
                 TotalPages = totalPages

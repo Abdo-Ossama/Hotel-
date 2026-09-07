@@ -11,11 +11,18 @@ namespace Hotel_Booking.Repositories.IRepositories
               Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
             CancellationToken cancellationToken = default);
 
+        IQueryable<T> GetQueryable(
+                Expression<Func<T, bool>>? expression = null,
+                List<Expression<Func<T, object>>>? includes = null,
+                 Func<IQueryable<T>, IQueryable<T>>? thenInclude = null,
+                bool tracked = false);
+
+
         Task<T?> GetOneAsync(
             Expression<Func<T, bool>>? expression = null,
             Expression<Func<T, object>>?[]? includes = null,
             bool tracked = true,
-                Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
+            Func<IQueryable<T>, IQueryable<T>>? includeThen = null,
             CancellationToken cancellationToken = default);
 
         Task CreateAysnc(T entity, CancellationToken cancellationToken = default);
@@ -25,5 +32,9 @@ namespace Hotel_Booking.Repositories.IRepositories
         void Delete(T entity);
 
         Task<int> CommitAsync(CancellationToken cancellationToken = default);
+
+        Task<bool> AnyAsync(
+            Expression<Func<T, bool>> expression,
+            CancellationToken cancellationToken = default);
     }
 }

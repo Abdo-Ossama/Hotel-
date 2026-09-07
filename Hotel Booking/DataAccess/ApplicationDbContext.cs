@@ -20,7 +20,7 @@ namespace Hotel_Booking.DataAccess
         }
 
         public DbSet<Amenity> Amenities { get; set; }
-
+ 
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingRoom> BookingRooms { get; set; }
         public DbSet<BookingService> BookingServices { get; set; }
@@ -32,7 +32,6 @@ namespace Hotel_Booking.DataAccess
         public DbSet<HotelService> HotelServices { get; set; }
 
         public DbSet<Payment> Payments { get; set; }
-        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
         public DbSet<Refund> Refunds { get; set; }
 
         public DbSet<Review> Reviews { get; set; }
@@ -57,6 +56,8 @@ namespace Hotel_Booking.DataAccess
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+
 
             builder.Entity<Booking>()
                 .HasIndex(e => e.BookingNumber)

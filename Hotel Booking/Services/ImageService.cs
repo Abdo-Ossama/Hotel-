@@ -1,7 +1,6 @@
-﻿using CodegateTest.Services.IServices;
+﻿namespace Hotel_Booking.Services.IServices;
 
-namespace CodegateTest.Services
-{
+
     public class ImageService : IImageService
     {
         private readonly string[] _allowedExtensions =
@@ -80,4 +79,4 @@ namespace CodegateTest.Services
             return false;
         }
     }
-}
+

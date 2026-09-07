@@ -74,6 +74,37 @@ namespace Hotel_Booking.Repositories
             return result;
         }
 
+        // get all but Quarable => for Pagination
+        
+    
+            public IQueryable<T> GetQueryable(
+                Expression<Func<T, bool>>? expression = null,
+                List<Expression<Func<T, object>>>? includes = null,
+                Func<IQueryable<T>, IQueryable<T>>? thenInclude = null,
+                bool tracked = false)
+            {
+                IQueryable<T> query = _dbSet;
+
+
+                if (!tracked)
+                    query = query.AsNoTracking();
+
+                // Includes
+                if (includes != null)
+                {
+                    foreach (var include in includes)
+                    {
+                        query = query.Include(include);
+                    }
+                }
+
+              
+                if (expression != null)
+                    query = query.Where(expression);
+
+                return query;
+            }
+        
 
         // Get One
         public async Task<T?> GetOneAsync(
@@ -197,5 +228,28 @@ namespace Hotel_Booking.Repositories
 
             return result;
         }
+
+
+        // Any
+        public async Task<bool> AnyAsync(
+            Expression<Func<T, bool>> expression,
+            CancellationToken cancellationToken = default)
+        {
+            _logger.LogDebug(
+                "Checking existence of {EntityType} entities.",
+                typeof(T).Name);
+
+            var result = await _dbSet.AnyAsync(expression, cancellationToken);
+
+            _logger.LogDebug(
+                "Existence check for {EntityType} completed. Exists: {Exists}",
+                typeof(T).Name,
+                result);
+
+            return result;
+        }
+
+ 
+      
     }
 }

@@ -10,7 +10,11 @@ public class RoomType
 
     [Required(ErrorMessage = "Room type name is required.")]
    
-    public string Name { get; set; } = string.Empty; // Single, Double, Suite, etc.
+    public string Name { get; set; } = string.Empty; // Single, Double, Suite,.
+
+    [Required(ErrorMessage = "Capacity int room is required.")]
+
+    public int Capacity { get; set; }
 
     [Required(ErrorMessage = "Description is required.")]
     public string Description { get; set; } = string.Empty;

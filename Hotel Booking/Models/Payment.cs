@@ -2,36 +2,38 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
-
 namespace Hotel_Booking.Models;
 
 public class Payment
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public Guid BookingId { get; set; }
-
     public Booking Booking { get; set; } = null!;
 
     [Required]
     [Precision(18, 2)]
     public decimal Amount { get; set; }
 
+    [Required]
     public string Currency { get; set; } = "EGP";
 
-    public PaymentStatus Status { get; set; }
-        = PaymentStatus.Pending;
+    [Required]
+    public string Provider { get; set; } = "Paymob";
 
-    public PaymentProviderType Provider { get; set; }
+    public string? ProviderOrderId { get; set; }
 
-    public DateTime CreatedAtUtc { get; set; }
-        = DateTime.UtcNow;
+    public string? ProviderTransactionId { get; set; }
 
-    // تسجيل بيانات الدفع سواء نجحت او فشلت ..
-    public ICollection<PaymentTransaction> Transactions { get; set; }
-        = new List<PaymentTransaction>();
+    public string? CheckoutUrl { get; set; }
 
-    // تسجيل بيانات استرجاع الفلوس سواء نجحت او فشلت ..
-    public ICollection<Refund> Refunds { get; set; }
-        = new List<Refund>();
+    public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
+
+    public string? LastEventPayload { get; set; }
+
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+
+    public DateTime? UpdatedAtUtc { get; set; }
+
+    public ICollection<Refund> Refunds { get; set; } = new List<Refund>();
 }
