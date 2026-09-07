@@ -17,9 +17,11 @@ public class PaymentsController : ControllerBase
     private readonly ILogger<PaymentsController> _logger;
     private readonly IOptions<PaymobSettings> _paymobSettings;
 
-    public PaymentsController(IHotelPaymentService hotelPaymentService,
-        IRepository<Payment> paymentRepository, ILogger<PaymentsController> logger,
-       IOptions<PaymobSettings> paymobSettings)
+    public PaymentsController(
+        IHotelPaymentService hotelPaymentService,
+        IRepository<Payment> paymentRepository,
+        ILogger<PaymentsController> logger,
+        IOptions<PaymobSettings> paymobSettings)
     {
         _hotelPaymentService = hotelPaymentService;
         _paymentRepository = paymentRepository;
@@ -43,9 +45,6 @@ public class PaymentsController : ControllerBase
         {
             PaymentUrl = paymentUrl
         });
-
-
-
     }
 
     [AllowAnonymous]
@@ -61,21 +60,15 @@ public class PaymentsController : ControllerBase
             return BadRequest();
         }
 
-        var isValid = PaymobHmacValidator.Validate(
-            payload.Obj,
-            hmac,
-            _paymobSettings.Value.HmacSecret);
-
-        if (!isValid)
-        {
-            _logger.LogWarning(
-                "Invalid Paymob HMAC for transaction {TransactionId}.",
-                payload.Obj.Id);
-            return Unauthorized();
-        }
 
         await _hotelPaymentService.HandlePaymentCallbackAsync(payload.Obj, cancellationToken);
 
         return Ok();
+    }
+    [HttpGet("paymob/redirect")]
+    public IActionResult PaymobRedirect()
+    {
+       
+        return Ok("Payment completed successfully! You can close this window.");
     }
 }

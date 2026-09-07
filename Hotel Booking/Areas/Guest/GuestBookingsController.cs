@@ -14,7 +14,7 @@ namespace Hotel_Booking.Controllers
     [Area(SD.GUEST_AREA)]
     [Route("api/[area]/[controller]")]
     [ApiController]
-    public class AdminBookingsController : ControllerBase
+    public class GuestBookingsController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IRepository<Room> _roomRepository;
@@ -22,10 +22,10 @@ namespace Hotel_Booking.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Payment> _paymentRepository;
         private readonly PaymobSettings _stripeSettings;
-        private readonly ILogger<AdminBookingsController> _logger;
+        private readonly ILogger<GuestBookingsController> _logger;
 
 
-        public AdminBookingsController(
+        public GuestBookingsController(
             UserManager<ApplicationUser> userManager,
             IRepository<Room> roomRepository,
             IRepository<Booking> bookingRepository,
@@ -33,7 +33,7 @@ namespace Hotel_Booking.Controllers
             IRepository<Payment> paymentRepository,
 
             IOptions<PaymobSettings> stripeSettings,
-            ILogger<AdminBookingsController> logger)
+            ILogger<GuestBookingsController> logger)
         {
             _userManager = userManager;
             _roomRepository = roomRepository;
@@ -44,7 +44,7 @@ namespace Hotel_Booking.Controllers
             _stripeSettings = stripeSettings.Value;
             _logger = logger;
 
-            //StripeConfiguration.ApiKey = _stripeSettings.SecurityKey;
+           
         }
 
         [HttpPost]
@@ -52,9 +52,12 @@ namespace Hotel_Booking.Controllers
             [FromBody] CreateBookingRequest createBookingRequest,
             CancellationToken cancellationToken)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
+               ?? User.FindFirst("sub")?.Value
+               ?? User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
             if (string.IsNullOrEmpty(userId))
-                throw new UnauthorizedAccessException();
+                throw new UnauthorizedAccessException("User Id is not found");
 
             if (createBookingRequest.RoomIds == null ||
                 !createBookingRequest.RoomIds.Any() ||

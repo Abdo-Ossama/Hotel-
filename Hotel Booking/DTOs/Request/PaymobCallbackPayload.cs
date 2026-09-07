@@ -1,7 +1,8 @@
-﻿namespace Hotel_Booking.DTOs.Request
+﻿namespace Hotel_Booking.DTOs.Request;
+
+public class PaymobCallbackPayload
 {
-    public class PaymobCallbackPayload
-    {
-        public PaymobTransactionObj Obj { get; set; } = default!;
-    }
+    public string? Type { get; set; }
+
+    public PaymobTransactionObj Obj { get; set; } = default!;
 }
