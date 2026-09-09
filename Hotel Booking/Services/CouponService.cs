@@ -24,10 +24,10 @@ public class CouponService : ICouponService
     }
 
     public async Task<Coupon> CreateAsync(
-        CreateCouponRequest request,
+        CreateCouponRequest  createCouponRequest,
         CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(request.Code))
+        if (string.IsNullOrWhiteSpace(createCouponRequest.Code))
             throw new ValidationAppException(
                 "Invalid coupon code.",
                 new Dictionary<string, string[]>
@@ -35,12 +35,12 @@ public class CouponService : ICouponService
                     ["Code"] = ["Coupon code is required."]
                 });
 
-        var code = request.Code
+        var code = createCouponRequest.Code
             .Trim()
             .ToUpperInvariant();
 
-        if (request.DiscountPercentage <= 0 ||
-            request.DiscountPercentage > 100)
+        if (createCouponRequest.DiscountPercentage <= 0 ||
+            createCouponRequest.DiscountPercentage > 100)
             throw new ValidationAppException(
                 "Invalid discount percentage.",
                 new Dictionary<string, string[]>
@@ -49,7 +49,7 @@ public class CouponService : ICouponService
                     ["Discount percentage must be between 0.01 and 100."]
                 });
 
-        if (request.UsageLimit <= 0)
+        if (createCouponRequest.UsageLimit <= 0)
             throw new ValidationAppException(
                 "Invalid usage limit.",
                 new Dictionary<string, string[]>
@@ -58,7 +58,7 @@ public class CouponService : ICouponService
                     ["Usage limit must be greater than zero."]
                 });
 
-        if (request.StartDateUtc >= request.ExpiryDateUtc)
+        if (createCouponRequest.StartDateUtc >= createCouponRequest.ExpiryDateUtc)
             throw new ValidationAppException(
                 "Invalid coupon dates.",
                 new Dictionary<string, string[]>
@@ -80,11 +80,11 @@ public class CouponService : ICouponService
         {
             Code = code,
             DiscountPercentage =
-                Math.Round(request.DiscountPercentage, 2),
-            UsageLimit = request.UsageLimit,
+                Math.Round(createCouponRequest.DiscountPercentage, 2), // 2 number after <  .   >
+            UsageLimit = createCouponRequest.UsageLimit,
             UsedCount = 0,
-            StartDateUtc = request.StartDateUtc,
-            ExpiryDateUtc = request.ExpiryDateUtc,
+            StartDateUtc = createCouponRequest.StartDateUtc,
+            ExpiryDateUtc = createCouponRequest.ExpiryDateUtc,
             IsActive = true
         };
 
@@ -133,14 +133,14 @@ public class CouponService : ICouponService
 
     public async Task<ApplyCouponResponse> ApplyCouponAsync(
         string userId,
-        ApplyCouponRequest request,
+        ApplyCouponRequest  applyCouponRequest,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(userId))
             throw new UnauthorizedAccessException(
                 "User not authenticated.");
 
-        if (request.BookingId == Guid.Empty)
+        if (applyCouponRequest.BookingId == Guid.Empty)
             throw new ValidationAppException(
                 "Invalid booking.",
                 new Dictionary<string, string[]>
@@ -149,7 +149,7 @@ public class CouponService : ICouponService
                     ["Booking id is required."]
                 });
 
-        if (string.IsNullOrWhiteSpace(request.Code))
+        if (string.IsNullOrWhiteSpace(applyCouponRequest.Code))
             throw new ValidationAppException(
                 "Invalid coupon code.",
                 new Dictionary<string, string[]>
@@ -158,13 +158,13 @@ public class CouponService : ICouponService
                     ["Coupon code is required."]
                 });
 
-        var code = request.Code
+        var code = applyCouponRequest.Code
             .Trim()
             .ToUpperInvariant();
 
         var booking = await _bookingRepository
             .GetQueryable(
-                e => e.Id == request.BookingId &&
+                e => e.Id == applyCouponRequest.BookingId &&
                      e.CustomerId == userId,
                 tracked: true)
             .FirstOrDefaultAsync(cancellationToken);

@@ -39,7 +39,7 @@ public class GuestBookingsController : ControllerBase
     [HttpPost("{bookingId}/cancel")]
     public async Task<IActionResult> CancelBooking(
      Guid bookingId,
-     [FromBody] CancelBookingRequest? request,
+     [FromBody] CancelBookingRequest?  cancelBookingRequest,
      CancellationToken cancellationToken)
     {
         var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -47,7 +47,7 @@ public class GuestBookingsController : ControllerBase
         await _bookingService.CancelBookingAsync(
             bookingId,
             adminUserId!,
-            request?.CancellationReason,
+            cancelBookingRequest?.CancellationReason,
             cancellationToken);
 
         return NoContent();

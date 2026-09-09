@@ -22,7 +22,7 @@ public class Review
     [Required]
     public string Comment { get; set; } = string.Empty;
 
-    public bool IsApproved { get; set; } = true;
+    public bool IsApproved { get; set; }  // Active or not
 
     public DateTime CreatedAtUtc { get; set; }
         = DateTime.UtcNow;

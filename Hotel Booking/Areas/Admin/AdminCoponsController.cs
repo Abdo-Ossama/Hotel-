@@ -20,11 +20,11 @@ public class CouponsController : ControllerBase
     [HttpPost]
     [Authorize(Roles = SD.ADMIN_ROLE + "," + SD.RECEPTIONIST_ROLE)]
     public async Task<IActionResult> Create(
-        [FromBody] CreateCouponRequest request,
+        [FromBody] CreateCouponRequest  createCouponRequest,
         CancellationToken cancellationToken)
     {
         var result = await _couponService.CreateAsync(
-            request,
+            createCouponRequest,
             cancellationToken);
 
         return StatusCode(

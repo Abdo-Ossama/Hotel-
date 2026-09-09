@@ -123,7 +123,12 @@ builder.Services.AddScoped<IRepository<Guest>, Repository<Guest>>();
 
 builder.Services.AddScoped<IRepository<Payment>, Repository<Payment>>();
 
+builder.Services.AddScoped<IRepository<Review>, Repository<Review>>();
+
 builder.Services.AddScoped<IBookingService, BookingService>();
+
+
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddScoped<ICacheService, CacheService>();
 
