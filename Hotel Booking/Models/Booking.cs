@@ -31,6 +31,19 @@ public class Booking
     [Precision(18, 2)]
     public decimal GuestCount { get; set; }
 
+
+    [Precision(18, 2)]
+    public decimal SubTotal { get; set; }
+
+    public int? AppliedCouponId { get; set; }
+
+    public Coupon? AppliedCoupon { get; set; }
+
+    [StringLength(20)]
+    public string? AppliedCouponCode { get; set; }
+
+    [Precision(5, 2)]
+    public decimal AppliedCouponPercentage { get; set; }
     [Precision(18, 2)]
     public decimal DiscountAmount { get; set; }
 
@@ -62,6 +75,10 @@ public class Booking
 
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAtUtc { get; set; }
+
+
+
+
 
     // ─── Navigation Properties ───
     public ICollection<Guest> Guests { get; set; } = new List<Guest>();

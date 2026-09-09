@@ -12,7 +12,6 @@ public class BookingRoom
     public Booking Booking { get; set; } = null!;
 
     public int RoomId { get; set; }
-
     public Room Room { get; set; } = null!;
 
     // Historical snapshot

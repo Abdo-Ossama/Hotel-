@@ -4,6 +4,7 @@ using Hotel_Booking.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hotel_Booking.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260909133748_AddCouponDiscountPercentageAndUniqueCode")]
+    partial class AddCouponDiscountPercentageAndUniqueCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -131,17 +134,6 @@ namespace Hotel_Booking.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AppliedCouponCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<int?>("AppliedCouponId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("AppliedCouponPercentage")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
-
                     b.Property<string>("BookingNumber")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -210,10 +202,6 @@ namespace Hotel_Booking.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SubTotal")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("TaxAmount")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -229,8 +217,6 @@ namespace Hotel_Booking.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppliedCouponId");
 
                     b.HasIndex("BookingNumber")
                         .IsUnique();
@@ -837,17 +823,11 @@ namespace Hotel_Booking.Migrations
 
             modelBuilder.Entity("Hotel_Booking.Models.Booking", b =>
                 {
-                    b.HasOne("Hotel_Booking.Models.Coupon", "AppliedCoupon")
-                        .WithMany()
-                        .HasForeignKey("AppliedCouponId");
-
                     b.HasOne("Hotel_Booking.Models.ApplicationUser", "Customer")
                         .WithMany("Bookings")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("AppliedCoupon");
 
                     b.Navigation("Customer");
                 });

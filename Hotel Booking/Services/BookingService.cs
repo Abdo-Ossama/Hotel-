@@ -11,15 +11,17 @@ public class BookingService : IBookingService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRepository<Booking> _bookingRepository;
     private readonly IRepository<Room> _roomRepository;
+    private readonly IRepository<BookingRoom> _bookingRoomRepository;
     private readonly IRepository<Refund> _refundRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<BookingService> _logger;
 
-    public BookingService(UserManager<ApplicationUser> userManager, IRepository<Booking> bookingRepository, IRepository<Room> roomRepository, IRepository<Refund> refundRepository, IUnitOfWork unitOfWork, ILogger<BookingService> logger)
+    public BookingService(UserManager<ApplicationUser> userManager, IRepository<Booking> bookingRepository, IRepository<Room> roomRepository, IRepository<BookingRoom> bookingRoomRepository, IRepository<Refund> refundRepository, IUnitOfWork unitOfWork, ILogger<BookingService> logger)
     {
         _userManager = userManager;
         _bookingRepository = bookingRepository;
         _roomRepository = roomRepository;
+        _bookingRoomRepository = bookingRoomRepository;
         _refundRepository = refundRepository;
         _unitOfWork = unitOfWork;
         _logger = logger;
@@ -249,13 +251,19 @@ public class BookingService : IBookingService
                 room.UpdatedAtUtc = now;
             }
 
-            var basePrice =
-                rooms.Sum(
-                    r => r.RoomType.BasePricePerNight)
-                * totalNights;
+            var subTotal = _bookingRoomRepository
+         .GetQueryable(tracked: false)
+         .Sum(e => e.PricePerNightSnapshot) * totalNights;
 
-            var taxes = basePrice * 0.14m;
-            var total = basePrice + taxes;
+            var taxAmount =
+                Math.Round(subTotal * 0.14m, 2);
+
+            var feeAmount = 0m;
+
+            var totalPrice =
+                subTotal
+                + taxAmount
+                + feeAmount;
 
             var booking = new Booking
             {
@@ -269,8 +277,8 @@ public class BookingService : IBookingService
                 TotalNights = totalNights,
                 GuestCount = createBookingRequest.GuestCount,
 
-                TaxAmount = taxes,
-                TotalPrice = total,
+                TaxAmount = taxAmount,
+                TotalPrice = totalPrice,
 
                 Status = BookingStatus.PendingPayment,
 

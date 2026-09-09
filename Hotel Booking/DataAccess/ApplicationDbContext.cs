@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace Hotel_Booking.DataAccess
 {
@@ -108,6 +109,14 @@ namespace Hotel_Booking.DataAccess
             builder.Entity<Booking>()
                 .Property(e => e.RowVersion)
                 .IsRowVersion();
+
+
+            builder.Entity<Coupon>()
+    .HasIndex(e=> e.Code)
+    .IsUnique();
         }
+
+
+
     }
 }

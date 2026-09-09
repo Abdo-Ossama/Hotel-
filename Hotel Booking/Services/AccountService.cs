@@ -36,7 +36,7 @@ namespace Hotel_Booking.Services
 
                 user = new ApplicationUser
                 {
-                    UserName = googleUserInfo.userName,
+                    UserName = googleUserInfo.Email,
                     Email = googleUserInfo.Email,
 
                     FirstName = googleUserInfo.FirstName,

@@ -18,6 +18,7 @@ public class GuestBookingsController : ControllerBase
         _bookingService = bookingService;
     }
 
+    [Authorize(Roles = SD.GUEST_ROLE)]
     [HttpGet("my-bookings")]
     public async Task<ActionResult<PagedResponse<MyBookingResponse>>> GetMyBookings(
         [FromQuery] int page = 1,
@@ -34,6 +35,7 @@ public class GuestBookingsController : ControllerBase
     }
 
 
+    [Authorize(Roles = SD.GUEST_ROLE)]
     [HttpPost("{bookingId}/cancel")]
     public async Task<IActionResult> CancelBooking(
      Guid bookingId,

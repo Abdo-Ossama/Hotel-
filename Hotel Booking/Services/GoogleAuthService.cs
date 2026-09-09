@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 
 namespace Hotel_Booking.Services
@@ -14,25 +14,21 @@ namespace Hotel_Booking.Services
             _logger = logger;
         }
 
-
         public async Task<GoogleUserInfo> GoogleService(
             HttpContext httpContext)
         {
-            // 1. Get Google authentication result
             var result = await httpContext.AuthenticateAsync(
-                GoogleDefaults.AuthenticationScheme);
+                IdentityConstants.ExternalScheme);
 
-            if (!result.Succeeded || result.Principal is null)
+            if (!result.Succeeded ||
+                result.Principal is null)
             {
                 _logger.LogWarning(
-                    "Google authentication failed.");
+                    "Google external authentication failed.");
 
                 throw new UnauthorizedAccessException(
                     "Google authentication failed.");
             }
-
-
-            // 2. Get Google Claims
 
             var principal = result.Principal;
 
@@ -52,7 +48,6 @@ namespace Hotel_Booking.Services
                 .FindFirst(ClaimTypes.NameIdentifier)?
                 .Value;
 
-
             if (string.IsNullOrWhiteSpace(email))
             {
                 _logger.LogWarning(
@@ -68,7 +63,6 @@ namespace Hotel_Booking.Services
                         ]
                     });
             }
-
 
             if (string.IsNullOrWhiteSpace(googleId))
             {
@@ -86,13 +80,12 @@ namespace Hotel_Booking.Services
                     });
             }
 
-
             return new GoogleUserInfo
             {
                 Email = email,
 
                 GoogleId = googleId,
-              
+
                 FirstName =
                     string.IsNullOrWhiteSpace(firstName)
                         ? "User"
@@ -102,10 +95,7 @@ namespace Hotel_Booking.Services
                     string.IsNullOrWhiteSpace(lastName)
                         ? string.Empty
                         : lastName
-
-                       
             };
         }
     }
 }
-
