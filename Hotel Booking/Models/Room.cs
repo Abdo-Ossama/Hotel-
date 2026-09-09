@@ -16,6 +16,8 @@ public class Room
     public RoomStatus Status { get; set; }
         = RoomStatus.Available;
 
+    public DateTime UpdatedAtUtc { get; set; }
+
     public int RoomTypeId { get; set; }
 
     public RoomType RoomType { get; set; } = null!;

@@ -1,18 +1,10 @@
-﻿using Hotel_Booking.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace Hotel_Booking.DataAccess
 {
-
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-
-
-
-
-
         public ApplicationDbContext(
                DbContextOptions<ApplicationDbContext> options)
                : base(options)
@@ -20,12 +12,12 @@ namespace Hotel_Booking.DataAccess
         }
 
         public DbSet<Amenity> Amenities { get; set; }
- 
+        public DbSet<Notification> Notifications { get; set; }
+
         public DbSet<Booking> Bookings { get; set; }
         public DbSet<BookingRoom> BookingRooms { get; set; }
-        public DbSet<BookingService> BookingServices { get; set; }
 
-
+        public DbSet<BookingExtraService> BookingServices { get; set; }
 
         public DbSet<Coupon> Coupons { get; set; }
         public DbSet<CouponUsage> CouponUsages { get; set; }
@@ -36,36 +28,21 @@ namespace Hotel_Booking.DataAccess
 
         public DbSet<Review> Reviews { get; set; }
 
-
         public DbSet<Room> Rooms { get; set; }
         public DbSet<RoomType> RoomTypes { get; set; }
         public DbSet<RoomAmenity> RoomAmenities { get; set; }
         public DbSet<RoomImage> RoomImages { get; set; }
 
-      
-
-  
-       
-
-
-
- 
-
-  
-
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
-
 
             builder.Entity<Booking>()
                 .HasIndex(e => e.BookingNumber)
                 .IsUnique();
 
             builder.Entity<Booking>()
-         .HasIndex(b => b.CustomerId);
-           
+                .HasIndex(b => b.CustomerId);
 
             builder.Entity<BookingRoom>()
                 .HasKey(e => new
@@ -73,51 +50,64 @@ namespace Hotel_Booking.DataAccess
                     e.RoomId,
                     e.BookingId
                 });
+
             builder.Entity<RoomAmenity>()
                 .HasKey(e => new
                 {
                     e.RoomId,
                     e.AmenityId
                 });
-            builder.Entity<BookingService>()
+
+   
+            builder.Entity<BookingExtraService>()
                 .HasKey(e => new
                 {
                     e.BookingId,
                     e.HotelServiceId
                 });
 
-            builder.Entity<Review>()
-     .HasOne(e => e.Customer)
-     .WithMany(e => e.Reviews)
-     .HasForeignKey(e => e.CustomerId)
-     .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Notification>(entity =>
+            {
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
+                entity.HasIndex(e => new
+                {
+                    e.UserId,
+                    e.IsRead,
+                    e.CreatedAtUtc
+                });
+            });
+
+            builder.Entity<Review>()
+                .HasOne(e => e.Customer)
+                .WithMany(e => e.Reviews)
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Booking>()
-     .HasOne(e => e.Customer)
-     .WithMany(e => e.Bookings)
-     .HasForeignKey(e => e.CustomerId)
-     .OnDelete(DeleteBehavior.Restrict);
-
+                .HasOne(e => e.Customer)
+                .WithMany(e => e.Bookings)
+                .HasForeignKey(e => e.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Review>()
-     .HasOne(e => e.Booking)
-     .WithOne(e => e.Review)
-     .HasForeignKey<Review>(e => e.BookingId)
-     .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(e => e.Booking)
+                .WithOne(e => e.Review)
+                .HasForeignKey<Review>(e => e.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // RowVersion ( ROOM)
-
+            // Optimistic Concurrency 
+            // RowVersion (ROOM)
             builder.Entity<Room>()
-    .Property(r => r.RowVersion)
-    .IsRowVersion();
+                .Property(r => r.RowVersion)
+                .IsRowVersion();
+
+            builder.Entity<Booking>()
+                .Property(e => e.RowVersion)
+                .IsRowVersion();
         }
-        
-
-
-
-        
     }
-
-   
 }

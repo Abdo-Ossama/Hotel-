@@ -8,6 +8,7 @@
         Failed = 4,
         Expired = 5,
         PartiallyRefunded = 6,
-        Refunded = 7
+        RefundPending=7,
+        Refunded = 8
     }
 }

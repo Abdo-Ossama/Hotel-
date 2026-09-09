@@ -12,7 +12,7 @@ namespace Hotel_Booking.Areas.Admin
     [Area(SD.ADMIN_AREA)]
     [Route("api/[area]/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = SD.ADMIN_ROLE + "," + SD.RECEPTIONIST_ROLE)]
     public class AdminRoomsController : ControllerBase
     {
 

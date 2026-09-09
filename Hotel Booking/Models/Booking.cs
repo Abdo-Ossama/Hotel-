@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
+namespace Hotel_Booking.Models;
+
 public class Booking
 {
     public Guid Id { get; set; }
@@ -19,16 +21,18 @@ public class Booking
     [Required]
     public DateTime CheckOutDate { get; set; }
 
+
+    public DateTime? CheckedOutAtUtc { get; set; }
+    public string? CheckedOutByUserId { get; set; }
+
     [Range(1, 365)]
     public int TotalNights { get; set; }
 
-
-  
     [Precision(18, 2)]
     public decimal GuestCount { get; set; }
 
     [Precision(18, 2)]
-    public decimal DiscountAmount { get; set; } 
+    public decimal DiscountAmount { get; set; }
 
     [Precision(18, 2)]
     public decimal TaxAmount { get; set; }
@@ -44,19 +48,25 @@ public class Booking
     public BookingStatus Status { get; set; } = BookingStatus.PendingPayment;
 
     public DateTime? PaymentDueAtUtc { get; set; }
-    public DateTime? ConfirmedAtUtc { get; set; } 
+    public DateTime? ConfirmedAtUtc { get; set; }
     public DateTime? CancelledAtUtc { get; set; }
 
     [StringLength(500)]
     public string? CancellationReason { get; set; }
 
+    public DateTime? CheckedInAtUtc { get; set; }
+    public string? CheckedInByUserId { get; set; }
+
+    //  Optimistic Concurrency 
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAtUtc { get; set; }
 
     // ─── Navigation Properties ───
-    public ICollection<Guest> Guests { get; set; } = new List<Guest>(); 
+    public ICollection<Guest> Guests { get; set; } = new List<Guest>();
     public ICollection<BookingRoom> BookingRooms { get; set; } = new List<BookingRoom>();
-    public ICollection<BookingService> BookingServices { get; set; } = new List<BookingService>();
+    public ICollection<BookingExtraService> BookingExtraServices { get; set; } = new List<BookingExtraService>();
     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     public Review? Review { get; set; }
 }

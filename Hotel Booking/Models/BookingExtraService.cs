@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Hotel_Booking.Models;
 
-public class BookingService
+public class BookingExtraService
 {
     public Guid BookingId { get; set; }
 

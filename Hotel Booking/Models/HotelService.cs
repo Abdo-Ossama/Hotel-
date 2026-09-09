@@ -16,6 +16,6 @@ public class HotelService
 
     public bool IsActive { get; set; } = true;
 
-    public ICollection<BookingService> BookingServices { get; set; }
-        = new List<BookingService>();
+    public ICollection<BookingExtraService> BookingServices { get; set; }
+        = new List<BookingExtraService>();
 }
