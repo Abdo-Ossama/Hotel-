@@ -14,9 +14,11 @@ public class BookingService : IBookingService
     private readonly IRepository<BookingRoom> _bookingRoomRepository;
     private readonly IRepository<Refund> _refundRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<BookingService> _logger;
 
-    public BookingService(UserManager<ApplicationUser> userManager, IRepository<Booking> bookingRepository, IRepository<Room> roomRepository, IRepository<BookingRoom> bookingRoomRepository, IRepository<Refund> refundRepository, IUnitOfWork unitOfWork, ILogger<BookingService> logger)
+    private const string CacheKey = CacheKeys.DashboardSummary;
+    public BookingService(UserManager<ApplicationUser> userManager, IRepository<Booking> bookingRepository, IRepository<Room> roomRepository, IRepository<BookingRoom> bookingRoomRepository, IRepository<Refund> refundRepository, IUnitOfWork unitOfWork, ICacheService cacheService, ILogger<BookingService> logger)
     {
         _userManager = userManager;
         _bookingRepository = bookingRepository;
@@ -24,6 +26,7 @@ public class BookingService : IBookingService
         _bookingRoomRepository = bookingRoomRepository;
         _refundRepository = refundRepository;
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _logger = logger;
     }
 
@@ -325,6 +328,8 @@ public class BookingService : IBookingService
 
             await transaction.CommitAsync(
                 cancellationToken);
+
+            await _cacheService.RemoveAsync(CacheKey);
 
             _logger.LogInformation(
                 "Booking created successfully. BookingId: {BookingId}, BookingNumber: {BookingNumber}, UserId: {UserId}",
@@ -684,6 +689,7 @@ public class BookingService : IBookingService
             await transaction.CommitAsync(
                 cancellationToken);
 
+            await _cacheService.RemoveAsync(CacheKey);
             _logger.LogInformation(
                 "Booking cancelled successfully. BookingId: {BookingId}, BookingNumber: {BookingNumber}, UserId: {UserId}",
                 booking.Id,
@@ -893,6 +899,8 @@ public class BookingService : IBookingService
             await transaction.CommitAsync(
                 cancellationToken);
 
+            await _cacheService.RemoveAsync(CacheKey);
+
             _logger.LogInformation(
                 "Guest checked in successfully. BookingId: {BookingId}, BookingNumber: {BookingNumber}, StaffUserId: {StaffUserId}",
                 booking.Id,
@@ -1075,6 +1083,8 @@ public class BookingService : IBookingService
 
             await transaction.CommitAsync(
                 cancellationToken);
+
+            await _cacheService.RemoveAsync(CacheKey);
 
             _logger.LogInformation(
                 "Guest checked out successfully. BookingId: {BookingId}, BookingNumber: {BookingNumber}, StaffUserId: {StaffUserId}",
