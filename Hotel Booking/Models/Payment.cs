@@ -34,6 +34,7 @@ public class Payment
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
     public DateTime? UpdatedAtUtc { get; set; }
+    public DateTime? PaidAtUtc { get; set; }
 
     public ICollection<Refund> Refunds { get; set; } = new List<Refund>();
 }

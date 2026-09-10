@@ -9,11 +9,11 @@ namespace Hotel_Booking.Controllers;
 [Route("api/[area]/[controller]")]
 [ApiController]
 [Authorize(Roles = SD.GUEST_ROLE)] 
-public class CouponController : ControllerBase
+public class GuestCouponController : ControllerBase
 {
     private readonly ICouponService _couponService;
 
-    public CouponController(ICouponService couponService)
+    public GuestCouponController(ICouponService couponService)
     {
         _couponService = couponService;
     }

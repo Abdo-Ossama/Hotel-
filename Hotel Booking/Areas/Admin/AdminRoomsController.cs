@@ -1,6 +1,6 @@
 ﻿using Hotel_Booking.Enums;
 using Hotel_Booking.Repositories.IRepositories;
-using Hotel_Booking.Services.Hotel_Booking.Services;
+using Hotel_Booking.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

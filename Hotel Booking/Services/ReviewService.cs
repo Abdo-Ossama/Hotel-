@@ -1,5 +1,4 @@
-﻿using Hotel_Booking.DTOs.Request;
-using Hotel_Booking.DTOs.Response;
+﻿
 using Hotel_Booking.Enums;
 using Hotel_Booking.Models;
 using Microsoft.Data.SqlClient;
@@ -10,29 +9,23 @@ namespace Hotel_Booking.Services;
 
 public class ReviewService : IReviewService
 {
-
-
     private const int SqlUniqueConstraintViolation = 2627; //violation for UNIQUE constraint  PRIMARY KEY constraint.
     private const int SqlUniqueIndexViolation = 2601; // violation for duplicate
 
-
-
-
     private readonly IRepository<Models.Review> _reviewRepository;
     private readonly IRepository<Booking> _bookingRepository;
+    private readonly ICacheService _cacheService;
     private readonly ILogger<ReviewService> _logger;
 
-    public ReviewService(
-        IRepository<Models.Review> reviewRepository,
-        IRepository<Booking> bookingRepository,
-        ILogger<ReviewService> logger)
+    private const string CacheKey = CacheKeys.DashboardSummary;
+
+    public ReviewService(IRepository<Models.Review> reviewRepository, IRepository<Booking> bookingRepository, ICacheService cacheService, ILogger<ReviewService> logger)
     {
         _reviewRepository = reviewRepository;
         _bookingRepository = bookingRepository;
+        _cacheService = cacheService;
         _logger = logger;
     }
-
-
 
     public async Task<ReviewResponse> CreateReviewAsync(
         CreateReviewRequest createReviewRequest,
@@ -63,7 +56,7 @@ public class ReviewService : IReviewService
             throw new NotFoundException("Booking not found.");
         }
 
- 
+
         if (booking.Status != BookingStatus.CheckedOut)
             throw new ValidationAppException(
                 "Booking is not eligible for review.",
@@ -72,7 +65,7 @@ public class ReviewService : IReviewService
                     ["Booking"] = ["You can only review a booking after your stay has been completed (checked out)."]
                 });
 
-     
+
         if (booking.Review is not null)
             throw new ConflictException("This booking has already been reviewed.");
 
@@ -82,7 +75,7 @@ public class ReviewService : IReviewService
             CustomerId = customerId,
             Rating = createReviewRequest.Rating,
             Comment = createReviewRequest.Comment.Trim(),
-            IsApproved = true, 
+            IsApproved = true,
             CreatedAtUtc = DateTime.UtcNow
         };
 
@@ -91,7 +84,7 @@ public class ReviewService : IReviewService
             await _reviewRepository.CreateAysnc(review, cancellationToken);
             await _reviewRepository.CommitAsync(cancellationToken);
         }
-      
+
         catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
         {
 
@@ -100,6 +93,8 @@ public class ReviewService : IReviewService
                 booking.Id);
             throw new ConflictException("This booking has already been reviewed.");
         }
+
+        await _cacheService.RemoveAsync(CacheKey);
 
         _logger.LogInformation(
             "Review created. ReviewId: {ReviewId}, BookingId: {BookingId}, CustomerId: {CustomerId}",
@@ -187,6 +182,8 @@ public class ReviewService : IReviewService
 
         await _reviewRepository.CommitAsync(cancellationToken);
 
+        await _cacheService.RemoveAsync(CacheKey);
+
         _logger.LogInformation(
             "Review updated. ReviewId: {ReviewId}, CustomerId: {CustomerId}",
             review.Id,
@@ -225,6 +222,8 @@ public class ReviewService : IReviewService
 
         await _reviewRepository.CommitAsync(cancellationToken);
 
+        await _cacheService.RemoveAsync(CacheKey);
+
         _logger.LogInformation(
             "Review deactivated by owner. ReviewId: {ReviewId}, CustomerId: {CustomerId}",
             reviewId, customerId);
@@ -258,6 +257,8 @@ public class ReviewService : IReviewService
         review.IsApproved = false;
 
         await _reviewRepository.CommitAsync(cancellationToken);
+
+        await _cacheService.RemoveAsync(CacheKey);
 
         _logger.LogInformation(
             "Review deactivated by admin. ReviewId: {ReviewId}", reviewId);

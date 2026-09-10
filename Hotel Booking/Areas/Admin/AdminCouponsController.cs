@@ -8,11 +8,11 @@ namespace Hotel_Booking.Controllers;
 [ApiController]
 [Route("api/[area]/[controller]")]
 [Authorize(Roles = SD.ADMIN_ROLE + "," + SD.RECEPTIONIST_ROLE)]
-public class CouponsController : ControllerBase
+public class AdminCouponsController : ControllerBase
 {
     private readonly ICouponService _couponService;
 
-    public CouponsController(ICouponService couponService)
+    public AdminCouponsController(ICouponService couponService)
     {
         _couponService = couponService;
     }

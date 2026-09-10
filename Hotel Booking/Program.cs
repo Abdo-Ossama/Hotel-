@@ -1,7 +1,7 @@
 using Hotel_Booking.API.Utility.DbInitializers;
 using Hotel_Booking.DataAccess;
 using Hotel_Booking.Services;
-using Hotel_Booking.Services.Hotel_Booking.Services;
+using Hotel_Booking.Services.IServices;
 using Hotel_Booking.Utilites.DbIntialiaion;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -104,6 +104,8 @@ builder.Services.Configure<PaymobSettings>(
     builder.Configuration.GetSection("Paymob"));
 
 builder.Services.AddScoped<ICouponService, CouponService>();
+
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddScoped<IRepository<Refund>, Repository<Refund>>();
 

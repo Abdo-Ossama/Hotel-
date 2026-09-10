@@ -15,7 +15,8 @@ namespace Hotel_Booking.Repositories.IRepositories
                 Expression<Func<T, bool>>? expression = null,
                 List<Expression<Func<T, object>>>? includes = null,
                  Func<IQueryable<T>, IQueryable<T>>? thenInclude = null,
-                bool tracked = false);
+                bool tracked = false,
+                CancellationToken cancellationToken = default);
 
 
         Task<T?> GetOneAsync(

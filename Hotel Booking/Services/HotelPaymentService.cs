@@ -18,23 +18,18 @@ public class HotelPaymentService : IHotelPaymentService
     private readonly PaymobSettings _paymobSettings;
     private readonly IRepository<Booking> _bookingRepository;
     private readonly IRepository<Payment> _paymentRepository;
+    private readonly ICacheService _cacheService;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ILogger<HotelPaymentService> _logger;
 
-    public HotelPaymentService(
-        HttpClient httpClient,
-        IOptions<PaymobSettings> paymobSettings,
-        IRepository<Booking> bookingRepository,
-        IRepository<Payment> paymentRepository,
-        UserManager<ApplicationUser> userManager,
-        IHttpContextAccessor httpContextAccessor,
-        ILogger<HotelPaymentService> logger)
+    public HotelPaymentService(HttpClient httpClient, PaymobSettings paymobSettings, IRepository<Booking> bookingRepository, IRepository<Payment> paymentRepository, ICacheService cacheService, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, ILogger<HotelPaymentService> logger)
     {
         _httpClient = httpClient;
-        _paymobSettings = paymobSettings.Value;
+        _paymobSettings = paymobSettings;
         _bookingRepository = bookingRepository;
         _paymentRepository = paymentRepository;
+        _cacheService = cacheService;
         _userManager = userManager;
         _httpContextAccessor = httpContextAccessor;
         _logger = logger;
@@ -96,8 +91,8 @@ public class HotelPaymentService : IHotelPaymentService
     }
 
     public async Task HandlePaymentCallbackAsync(
-        PaymobTransactionObj transaction,
-        CancellationToken cancellationToken = default)
+       PaymobTransactionObj transaction,
+       CancellationToken cancellationToken = default)
     {
         if (transaction?.Order is null)
         {
@@ -126,9 +121,15 @@ public class HotelPaymentService : IHotelPaymentService
         }
 
         payment.Status = transaction.Success ? PaymentStatus.Paid : PaymentStatus.Failed;
-        payment.ProviderTransactionId = transaction.Id.ToString();      
-        payment.LastEventPayload = JsonSerializer.Serialize(transaction); 
-        payment.UpdatedAtUtc = DateTime.UtcNow;                         
+        payment.ProviderTransactionId = transaction.Id.ToString();
+        payment.LastEventPayload = JsonSerializer.Serialize(transaction);
+        payment.UpdatedAtUtc = DateTime.UtcNow;
+
+
+        if (transaction.Success)
+        {
+            payment.PaidAtUtc = DateTime.UtcNow;
+        }
 
         _paymentRepository.Update(payment);
 
@@ -154,6 +155,11 @@ public class HotelPaymentService : IHotelPaymentService
         }
 
         await _paymentRepository.CommitAsync(cancellationToken);
+
+        if (transaction.Success)
+        {
+            await _cacheService.RemoveAsync("dashboard:summary");
+        }
 
         _logger.LogInformation(
             "Payment {PaymentId} updated to {Status} via Paymob callback.",

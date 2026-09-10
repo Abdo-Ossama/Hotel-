@@ -1,5 +1,4 @@
-﻿namespace Hotel_Booking.Services
-{
+﻿
     using System.Text.Json;
     using StackExchange.Redis;
 
@@ -7,9 +6,7 @@
     {
         public class CacheService : ICacheService
         {
-         
 
-            // redis store Variables as Camel Case not Pascal as c# so we use this line
             // case not sensitive
             private static readonly JsonSerializerOptions _jsonOptions = new()
             {
@@ -76,4 +73,4 @@
 
         }
     }
-}
+

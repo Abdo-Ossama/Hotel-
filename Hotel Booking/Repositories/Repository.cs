@@ -81,7 +81,8 @@ namespace Hotel_Booking.Repositories
                 Expression<Func<T, bool>>? expression = null,
                 List<Expression<Func<T, object>>>? includes = null,
                 Func<IQueryable<T>, IQueryable<T>>? thenInclude = null,
-                bool tracked = false)
+                bool tracked = false,
+                CancellationToken cancellationToken = default)
             {
                 IQueryable<T> query = _dbSet;
 

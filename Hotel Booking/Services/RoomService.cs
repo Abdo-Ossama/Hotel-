@@ -48,7 +48,6 @@ namespace Hotel_Booking.Services
             // Cache Key
             var cacheKey = $"rooms:available:page:{page}";
 
-            //
             // Get From Cache
             var cachedRooms =
                 await _cacheService.GetAsync<PagedResponse<RoomResponse>>(
